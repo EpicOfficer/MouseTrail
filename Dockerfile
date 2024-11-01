@@ -11,7 +11,7 @@ COPY make_request.sh /usr/local/bin/make_request.sh
 RUN chmod +x /usr/local/bin/make_request.sh
 
 # Set up the hourly cron job
-RUN echo "0 * * * * /usr/local/bin/make_request.sh" > /etc/crontabs/root
+RUN echo "0 * * * * /usr/local/bin/make_request.sh > /dev/stdout 2>&1" > /etc/crontabs/root
 
 # Start cron in foreground to keep the container running
 CMD ["crond", "-f"]
