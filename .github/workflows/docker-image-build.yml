@@ -31,12 +31,12 @@ jobs:
       # Step 3: Lowercase repository name
       - name: Lowercase repository name
         run: |
-          echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+          echo "REPO=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
 
       # Step 4: Build the Docker image
       - name: Build Docker Image
         run: |
-          docker build -t ghcr.io/${{ REPO }}:latest .
+          docker build -t ghcr.io/${{ env.REPO }}:latest .
 
       # Step 5: Push the image to GitHub Container Registry
       - name: Push Docker Image
