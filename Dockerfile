@@ -1,17 +1,12 @@
-# Use a lightweight base image
-FROM alpine:latest
+FROM alpine:3.18
 
-# Install curl and cron
+# Install necessary tools
 RUN apk add --no-cache curl busybox-suid
 
-# Copy the request script
+# Copy the request script, give execute permissions, and set up cron job
 COPY make_request.sh /usr/local/bin/make_request.sh
+RUN chmod +x /usr/local/bin/make_request.sh && \
+    echo "0 * * * * /usr/local/bin/make_request.sh > /dev/stdout 2>&1" > /etc/crontabs/root
 
-# Give execute permissions to the script
-RUN chmod +x /usr/local/bin/make_request.sh
-
-# Set up the hourly cron job
-RUN echo "0 * * * * /usr/local/bin/make_request.sh > /dev/stdout 2>&1" > /etc/crontabs/root
-
-# Start cron in foreground to keep the container running
-CMD ["crond", "-f"]
+# Run the script once on container startup and then start cron in foreground to keep the container running
+CMD /usr/local/bin/make_request.sh && crond -f
