@@ -27,6 +27,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Fetch repository description
+        id: repo-info
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          repo_desc=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            https://api.github.com/repos/${{ github.repository }} | jq -r .description)
+          echo "::set-output name=description::$repo_desc"
+
+      - name: Get short SHA
+        id: vars
+        run: echo "::set-output name=short_sha::${GITHUB_SHA::7}"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -47,9 +60,13 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          labels: |
+            org.opencontainers.image.description=${{ steps.repo-info.outputs.description }}
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
           tags: |
             latest
             {{ date 'YYYYMMDD' }}
+            ${{ steps.vars.outputs.short_sha }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
