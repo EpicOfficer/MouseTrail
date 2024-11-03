@@ -34,11 +34,12 @@ jobs:
         run: |
           repo_desc=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
             https://api.github.com/repos/${{ github.repository }} | jq -r .description)
-          echo "::set-output name=description::$repo_desc"
+          echo "description=$repo_desc" >> $GITHUB_ENV
+          echo "description=$repo_desc" >> $GITHUB_OUTPUT
 
       - name: Get short SHA
         id: vars
-        run: echo "::set-output name=short_sha::${GITHUB_SHA::7}"
+        run: echo "short_sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
