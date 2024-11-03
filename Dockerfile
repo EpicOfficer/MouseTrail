@@ -9,4 +9,4 @@ RUN chmod +x /usr/local/bin/make_request.sh && \
     echo "0 * * * * /usr/local/bin/make_request.sh > /dev/stdout 2>&1" > /etc/crontabs/root
 
 # Run the script once on container startup and then start cron in foreground to keep the container running
-CMD /usr/local/bin/make_request.sh && crond -f
+CMD ["/bin/sh", "-c", "/usr/local/bin/make_request.sh && crond -f"]
